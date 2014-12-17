@@ -1,0 +1,19 @@
+################################################################################
+#   Simply greps particle_properties.txt which is in the directory given
+#   by PATH_TO_PARTICLE_PROPERTIES.  Useful for quick querying of particle
+#   names, ids, masses etc..
+#
+#   Title  = particles.sh
+#   Author = Sam Hall
+#   Email  = shall@cern.ch
+################################################################################
+#
+
+PARTICLE_PROPERTIES=$0.txt
+echo ' '
+echo '--------------------------------------------------------------------------------------------------------------------------------'
+fgrep Name $PATH_TO_PARTICLE_PROPERTIES/$PARTICLE_PROPERTIES
+echo '|------------------------------------------------------------------------------------------------------------------------------|'
+fgrep $1 $PATH_TO_PARTICLE_PROPERTIES/$PARTICLE_PROPERTIES --color=auto
+echo '--------------------------------------------------------------------------------------------------------------------------------'
+echo ' '

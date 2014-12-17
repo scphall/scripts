@@ -1,0 +1,45 @@
+#!/usr/bin/python
+
+################################################################################
+
+"""
+    Quick script to remove ANSI colours from output for reading in vim.
+    Run the script with filename as input, output will have _vim.
+
+"""
+
+__title__  = "removeColours.py"
+__author__ = "Sam Hall"
+__email__  = "shall@cern.ch"
+
+################################################################################
+
+from messages import Messages
+import sys
+import os
+
+# Global messenger object.
+#msg = Messages([__title__,
+#'Remove ANSI colours for reading log file in vim.'])
+msg = Messages()
+
+
+def main(filename):
+    global msg
+    msg.info('Input file:  %s' % filename)
+    ext = filename.split('.')[-1]
+    filename_new = filename.replace('.%s' % ext, '_vim.%s' % ext)
+    msg.info('Output file: %s' % filename_new)
+    cmd = "cat -v %s|perl -lane 's/\^\[\[\d+(;\d+)*m//g; print' > %s"
+    cmd = cmd % (filename, filename_new)
+    msg.info(cmd)
+    os.system(cmd)
+    msg.foot()
+
+
+################################################################################
+
+if __name__ == "__main__":
+    if len(sys.argv) == 2:
+        main(sys.argv[1])
+

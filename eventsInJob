@@ -1,0 +1,34 @@
+#!/bin/bash
+
+# help
+usage() {
+  echo -e "Usage:\t$0 [job-directory] \n"
+  echo "Get number of events in a ganga job."
+  echo -e "job-directory defaults to current directory."
+  exit 1
+}
+[[ ($1 == "--help") || $1 == "-h" ]] && usage
+
+DIR=$PWD
+if [$# -eq 1]
+then
+  DIR=$1
+fi
+
+# Job number
+JOB=$(echo $DIR | tr / ' ' | awk '{print $(NF)}')
+if (($JOB>-1))
+then
+  echo Path invalid: $DIR
+  exit 1
+fi
+echo -ne "Job: $JOB\t"
+
+# get files and sum events
+FILES=$(find $DIR -name stdout)
+# Can do it faster, but playing with sed
+# Can do it in fewer lines (no egrep) but much slower
+egrep "events processed" $FILES |
+  sed -n 's/^.*SUCCESS \([0-9]\{1,10\}\) events processed/\1/p' |
+  awk '{count+=$1} END {print count}'
+

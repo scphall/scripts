@@ -10,7 +10,7 @@ usage() {
 [[ ($1 == "--help") || $1 == "-h" ]] && usage
 
 DIR=$PWD
-if [$# -eq 1]
+if [ $# -eq 1 ]
 then
   DIR=$1
 fi

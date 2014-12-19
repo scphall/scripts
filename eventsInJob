@@ -17,7 +17,7 @@ fi
 
 # Job number
 JOB=$(echo $DIR | tr / ' ' | awk '{print $(NF)}')
-if (($JOB>-1))
+if (($JOB<0))
 then
   echo Path invalid: $DIR
   exit 1

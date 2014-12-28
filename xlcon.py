@@ -8,18 +8,17 @@ __author__ = 'Sam Hall'
 
 class Data(object):
     def __init__(self):
-        self.data = {
-            'Code' : [],
-            'Name' : [],
-            'Details' : [],
-            'Cost' : [],
-        }
+        self.columns = ['Code', 'Name', 'Cost', 'Measure', 'Details']
+        self.data = {x:[] for x in self.columns}
         self.reset_current()
         self.reg = re.compile('^(\d+)\s*-\s*(.*)$')
+        self.reg2 = re.compile('^length|quantity|area|volume')
         return
 
     def reset_current(self):
-        self.current = {'Code':False, 'Name':False, 'Details':'', 'Cost':False}
+        self.current = {
+            'Code':False, 'Name':False, 'Details':'', 'Cost':False, 'Measure':'-'
+        }
         return
 
     def row_to_data(self):
@@ -42,15 +41,27 @@ class Data(object):
             self.current['Cost'] = data[-1]
             self.current['Details'] = '{} '.format(data[-2])
         else:
-            #data = [x for x in data if not x.lower().startswith('api')]
             try:
+                measures = []
+                for i, datum in enumerate(data):
+                    search = self.reg2.search(datum.lower())
+                    if search is not None:
+                        measures.append(i)
+                        measures.append(i+1)
+                        break
+                if len(measures):
+                    self.current['Measure'] = data.pop(measures[1])
+                    data.pop(measures[0])
+                    #print data
+                    #print self.current['Measure']
                 self.current['Details'] += ' '.join(data) + ' '
-            except TypeError:
+            except:
                 pass
         return
 
     def save(self, filename):
-        pddata = pd.DataFrame.from_dict(self.data)
+        pddata = pd.DataFrame.from_dict(self.data)#, columns=self.columns)
+        pddata = pddata[self.columns]
         pddata.to_excel(filename)
         return
 
@@ -61,20 +72,27 @@ def convert(*args, **kwargs):
     """
     Convert totally unhelpful spreadsheet of specific format into useful one
     """
-    output = 'output.xls'
-    if kwargs.has_key('output'):
-        output = kwargs['output']
-    elif len(kwargs):
-        print 'Unknown option(s): {}'.format(kwargs.keys())
+    opts = {'output' : 'output.xls', 'sheet' : 0}
+    for k, i in kwargs.iteritems():
+        if opts.has_key(k):
+            opts[k] = i
+        else:
+            print 'Unknown option: {}'.format(k)
+    output = opts['output']
+    sheet = opts['sheet']
     data = Data()
     for arg in args:
-        ex = pd.io.excel.read_excel(arg)
+        print 'Input file:  {:50}\tsheet: {}'.format(arg, sheet)
+        ex = pd.io.excel.read_excel(arg, sheetname=sheet)
         for ex_row in ex.values:
             data.add_row(ex_row)
     data.save(output)
+    print 'Output file: {}'.format(output)
+    return
 
 
 if __name__ == "__main__":
-    convert('Book1.xlsx')
+    convert('Book2.xls')
+    convert('Book2.xls', output='out2.xls', sheet=1)
 
 

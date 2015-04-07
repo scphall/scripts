@@ -29,8 +29,6 @@ mycd () {
     *)
       newdir=$input
   esac
-  echo $newdir
-  return 0
   [[ ${newdir:0:1} == '~' ]] && newdir="$HOME${newdir:1}"
 
   # Change directory magic line

@@ -3,13 +3,18 @@
 mycd () {
   local input=$1
   local newdir
+  local -i count
   case "$input" in
     "?")
       dirs -v
       return 0
       ;;
-    ...)
-      newdir="../.."
+    ...*)
+      newdir="/.."
+      for (( count=1; count < ${#input}; count++ )) do
+        newdir=$newdir"/.."
+      done
+      newdir=${newdir:1}
       ;;
     -*)
       local index=${input:1}
@@ -24,6 +29,8 @@ mycd () {
     *)
       newdir=$input
   esac
+  echo $newdir
+  return 0
   [[ ${newdir:0:1} == '~' ]] && newdir="$HOME${newdir:1}"
 
   # Change directory magic line
